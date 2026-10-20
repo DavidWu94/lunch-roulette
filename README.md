@@ -8,7 +8,8 @@
 ![JavaScript](https://img.shields.io/badge/Vanilla_JS-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Web Audio API](https://img.shields.io/badge/Web_Audio_API-00F2FE?style=for-the-badge)
 
-🔗 **線上即時體驗網址**：[https://davidwu94.github.io/lunch-roulette/](https://davidwu94.github.io/lunch-roulette/)
+🔗 **線上即時體驗網址**：[https://davidwu94.github.io/lunch-roulette/](https://davidwu94.github.io/lunch-roulette/)  
+📄 **產品與技術完整規格書**：[完整規格書 (SPECIFICATION.md)](file:///c:/Users/david/OneDrive/桌面/school/TAICA/SPECIFICATION.md) | [線上規格書](https://github.com/DavidWu94/lunch-roulette/blob/main/SPECIFICATION.md)
 
 ---
 
