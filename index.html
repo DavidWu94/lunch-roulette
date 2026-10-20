@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>午餐輪盤賭 ✕ 預算刮刮樂 | 吃什麼救星</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Canvas Confetti (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       CSS Variables & Global Reset
+       ========================================================================== */
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-surface: #111827;
+      --bg-surface-elevated: #1e293b;
+      --bg-glass: rgba(17, 24, 39, 0.75);
+      --bg-glass-card: rgba(30, 41, 59, 0.6);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 242, 254, 0.3);
+      
+      --neon-cyan: #00f2fe;
+      --neon-blue: #4facfe;
+      --neon-pink: #f72585;
+      --neon-purple: #7209b7;
+      --neon-amber: #ffb703;
+      --neon-emerald: #10b981;
+      --neon-rose: #ff4d6d;
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      
+      --shadow-glow-cyan: 0 0 25px rgba(0, 242, 254, 0.35);
+      --shadow-glow-pink: 0 0 25px rgba(247, 37, 133, 0.35);
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      
+      --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(114, 9, 183, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(0, 242, 254, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(247, 37, 133, 0.12) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, button, select {
+      font-family: inherit;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ==========================================================================
+       Header & Navigation
+       ========================================================================== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-glass);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(120deg, #ffffff 40%, var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-badge {
+      font-size: 0.65rem;
+      background: rgba(247, 37, 133, 0.2);
+      border: 1px solid var(--neon-pink);
+      color: #ff70a6;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Tabs Pill */
+    .tabs-nav {
+      display: flex;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-glass);
+      gap: 4px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-normal);
+      position: relative;
+    }
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+    .tab-btn.active {
+      color: #0b0f19;
+      background: linear-gradient(135deg, var(--neon-cyan), #4facfe);
+      box-shadow: 0 2px 14px rgba(0, 242, 254, 0.4);
+    }
+    .tab-btn.active.tab-scratch {
+      background: linear-gradient(135deg, #ffd60a, #ff9e00);
+      box-shadow: 0 2px 14px rgba(255, 214, 10, 0.4);
+    }
+
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .icon-btn {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      transition: var(--transition-normal);
+    }
+    .icon-btn:hover {
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    .icon-btn.active {
+      color: var(--neon-cyan);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.25);
+    }
+
+    /* ==========================================================================
+       Main Container & Layout
+       ========================================================================== */
+    .app-main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       Tab 1: Wheel View Layout
+       ========================================================================== */
+    .wheel-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (min-width: 992px) {
+      .wheel-layout {
+        grid-template-columns: 1.25fr 1fr;
+        gap: 36px;
+      }
+    }
+
+    /* Left: Wheel Stage */
+    .wheel-stage-card {
+      background: var(--bg-glass-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 30px 20px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .wheel-stage-card::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wheel-canvas-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 1 / 1;
+      margin: 10px auto 26px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
+    }
+
+    /* 指針 (Pointer) */
+    .wheel-pointer {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 42px;
+      height: 48px;
+      z-index: 10;
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+      transform-origin: 50% 10px;
+      transition: transform 0.08s ease-out;
+    }
+    .wheel-pointer svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 輪盤操作按鈕組 */
+    .wheel-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      width: 100%;
+      max-width: 400px;
+      z-index: 2;
+    }
+
+    .btn-spin {
+      flex: 1;
+      height: 56px;
+      background: linear-gradient(135deg, var(--neon-cyan), #0072ff);
+      color: #04101e;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0, 242, 254, 0.4);
+      transition: var(--transition-spring);
+    }
+    .btn-spin:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(0, 242, 254, 0.6);
+    }
+    .btn-spin:active:not(:disabled) {
+      transform: translateY(1px) scale(0.98);
+    }
+    .btn-spin:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .btn-quick-reshuffle {
+      height: 56px;
+      width: 56px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+      transition: var(--transition-normal);
+      flex-shrink: 0;
+    }
+    .btn-quick-reshuffle:hover {
+      color: var(--neon-cyan);
+      border-color: var(--neon-cyan);
+      transform: rotate(90deg);
+    }
+
+    /* Right: Menu Management Pool */
+    .pool-card {
+      background: var(--bg-glass-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .pool-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pool-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pool-count-badge {
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      color: var(--neon-cyan);
+      font-weight: 700;
+    }
+
+    /* 分類標籤篩選列 */
+    .category-filter-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .category-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .cat-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition-normal);
+    }
+    .cat-chip:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .cat-chip.active {
+      background: rgba(0, 242, 254, 0.15);
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+
+    /* 新增項目輸入區 */
+    .add-item-form {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+    }
+    .add-item-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      padding: 8px 12px;
+      user-select: text;
+    }
+    .add-item-input::placeholder {
+      color: var(--text-muted);
+    }
+    .add-item-select {
+      background: var(--bg-surface-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      padding: 0 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn-add-item {
+      background: linear-gradient(135deg, var(--neon-cyan), #0072ff);
+      color: #0b0f19;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0 16px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+    .btn-add-item:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    /* 菜單清單 (Chips / Items) */
+    .menu-items-scroll {
+      max-height: 380px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+    .menu-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      transition: var(--transition-normal);
+    }
+    .menu-item-row:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateX(3px);
+    }
+    .menu-item-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .menu-item-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px currentColor;
+    }
+    .menu-item-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+    .menu-item-cat {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+    .btn-del-item {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition-normal);
+    }
+    .btn-del-item:hover {
+      color: var(--neon-rose);
+      background: rgba(255, 77, 109, 0.15);
+    }
+
+    .pool-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-glass);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .btn-reset-pool {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 0.82rem;
+      transition: var(--transition-normal);
+    }
+    .btn-reset-pool:hover {
+      color: var(--neon-rose);
+    }
+
+    /* ==========================================================================
+       Tab 2: Scratch Card View Layout
+       ========================================================================== */
+    .scratch-layout {
+      max-width: 560px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .scratch-intro-text {
+      text-align: center;
+    }
+    .scratch-intro-text h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffd60a, #ff9e00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .scratch-intro-text p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* 刮刮卡主體容器 */
+    .scratch-card-box {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      max-height: 320px;
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 214, 10, 0.25);
+      background: #0f172a;
+    }
+
+    /* 底層內容區（揭曉內容） */
+    .scratch-reward-layer {
+      position: absolute;
+      inset: 0;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(145deg, #161e31, #0c1220);
+      z-index: 1;
+    }
+    .reward-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #ffd60a;
+      background: rgba(255, 214, 10, 0.12);
+      border: 1px solid rgba(255, 214, 10, 0.3);
+      padding: 3px 12px;
+      border-radius: var(--radius-full);
+      margin-bottom: 10px;
+    }
+    .reward-amount {
+      font-size: 2.8rem;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff, #ffd60a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .reward-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 8px;
+    }
+    .reward-quote {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      max-width: 90%;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* 上層刮除 Canvas */
+    #scratchCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      cursor: grab;
+      touch-action: none;
+      transition: opacity 0.4s ease-out;
+    }
+    #scratchCanvas:active {
+      cursor: grabbing;
+    }
+
+    /* 刮刮卡進度與操作列 */
+    .scratch-controls {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .scratch-progress-wrapper {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .scratch-progress-bar {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .scratch-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd60a, #ff9e00);
+      border-radius: var(--radius-full);
+      transition: width 0.15s ease-out;
+    }
+    .scratch-progress-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffd60a;
+      min-width: 45px;
+      text-align: right;
+    }
+
+    .btn-new-scratch {
+      width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, #ffd60a, #ff9e00);
+      color: #0b0f19;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(255, 214, 10, 0.35);
+      transition: var(--transition-spring);
+    }
+    .btn-new-scratch:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(255, 214, 10, 0.5);
+    }
+    .btn-new-scratch:active {
+      transform: translateY(1px);
+    }
+
+    /* ==========================================================================
+       Modals & Drawers (歷史紀錄、中獎彈窗)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 14, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-out;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 420px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), var(--shadow-glow-cyan);
+      transform: scale(0.9) translateY(20px);
+      transition: var(--transition-spring);
+      position: relative;
+      text-align: center;
+    }
+    .modal-overlay.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    /* 中獎彈窗內部樣式 */
+    .winner-badge {
+      font-size: 0.85rem;
+      color: var(--neon-cyan);
+      letter-spacing: 2px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .winner-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+    }
+    .winner-category {
+      display: inline-block;
+      font-size: 0.82rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    .winner-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn-modal-primary {
+      flex: 1;
+      height: 48px;
+      background: linear-gradient(135deg, var(--neon-cyan), #0072ff);
+      color: #04101e;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+    .btn-modal-primary:hover {
+      filter: brightness(1.1);
+    }
+    .btn-modal-secondary {
+      flex: 1;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+    .btn-modal-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* 歷史紀錄彈窗 */
+    .history-card {
+      max-width: 480px;
+      text-align: left;
+    }
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .history-header h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .history-list {
+      max-height: 340px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-glass);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+    }
+    .history-item-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .history-item-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .history-item-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+    .badge-wheel {
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--neon-cyan);
+    }
+    .badge-scratch {
+      background: rgba(255, 214, 10, 0.15);
+      color: #ffd60a;
+    }
+    .history-empty {
+      text-align: center;
+      padding: 40px 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+      pointer-events: none;
+    }
+    .toast-msg {
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid var(--neon-cyan);
+      box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+      font-weight: 600;
+      animation: toastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .app-header {
+        padding: 10px 14px;
+      }
+      .brand-title {
+        display: none;
+      }
+      .tab-btn {
+        padding: 6px 12px;
+        font-size: 0.82rem;
+      }
+      .app-main {
+        padding: 16px 12px 30px;
+      }
+      .wheel-stage-card, .pool-card {
+        padding: 18px 14px;
+      }
+      .reward-amount {
+        font-size: 2.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Header
+       ========================================================================== -->
+  <header class="app-header">
+    <a href="#" class="brand">
+      <div class="brand-icon">🍕</div>
+      <span class="brand-title">吃什麼救星</span>
+      <span class="brand-badge">PRO</span>
+    </a>
+
+    <!-- Tab 雙切換按鈕 -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" id="tabWheelBtn" onclick="switchTab('wheel')">
+        <span>🎡 命運大輪盤</span>
+      </button>
+      <button class="tab-btn tab-scratch" id="tabScratchBtn" onclick="switchTab('scratch')">
+        <span>🪙 預算刮刮樂</span>
+      </button>
+    </nav>
+
+    <!-- 輔助按鈕：音效切換與歷史紀錄 -->
+    <div class="header-actions">
+      <button class="icon-btn active" id="muteToggleBtn" title="切換靜音" onclick="toggleMute()">
+        <span id="muteIcon">🔊</span>
+      </button>
+      <button class="icon-btn" id="historyBtn" title="查看歷史紀錄" onclick="openHistoryModal()">
+        <span>📜</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       Main App View
+       ========================================================================== -->
+  <main class="app-main">
+
+    <!-- ==================== TAB 1: 命運大輪盤 ==================== -->
+    <section class="tab-content active" id="wheelSection">
+      <div class="wheel-layout">
+        
+        <!-- 左側：輪盤舞臺 -->
+        <div class="wheel-stage-card">
+          <div class="wheel-canvas-wrapper">
+            <!-- 指針 -->
+            <div class="wheel-pointer" id="wheelPointer">
+              <svg viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 46L5 12C3 7 7 2 12 2H28C33 2 37 7 35 12L20 46Z" fill="#F72585" stroke="#FFFFFF" stroke-width="3"/>
+                <circle cx="20" cy="14" r="5" fill="#FFFFFF"/>
+              </svg>
+            </div>
+            <!-- Canvas -->
+            <canvas id="wheelCanvas" width="800" height="800"></canvas>
+          </div>
+
+          <!-- 動作按鈕 -->
+          <div class="wheel-actions">
+            <button class="btn-spin" id="spinBtn" onclick="spinWheel()">
+              <span>🚀 立即開抽</span>
+            </button>
+            <button class="btn-quick-reshuffle" title="打亂排序" onclick="shuffleCurrentItems()">
+              <span>🔀</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 右側：菜單管理池 -->
+        <div class="pool-card">
+          <div class="pool-header">
+            <div class="pool-title">
+              <span>🎯 菜單自訂池</span>
+              <span class="pool-count-badge" id="poolCountBadge">8 項</span>
+            </div>
+          </div>
+
+          <!-- 分類標籤篩選列 -->
+          <div class="category-filter-bar" id="categoryFilterBar">
+            <button class="cat-chip active" onclick="setCategoryFilter('all')">全部</button>
+            <button class="cat-chip" onclick="setCategoryFilter('平價小吃')">🥢 平價小吃</button>
+            <button class="cat-chip" onclick="setCategoryFilter('健康輕食')">🥗 健康輕食</button>
+            <button class="cat-chip" onclick="setCategoryFilter('異國料理')">🍜 異國料理</button>
+            <button class="cat-chip" onclick="setCategoryFilter('大餐犒賞')">🥩 大餐犒賞</button>
+          </div>
+
+          <!-- 新增自訂菜單 -->
+          <form class="add-item-form" onsubmit="handleAddItem(event)">
+            <input type="text" class="add-item-input" id="newItemInput" placeholder="想吃什麼？輸入餐點..." maxlength="16" required autocomplete="off" />
+            <select class="add-item-select" id="newItemCategory">
+              <option value="平價小吃">平價小吃</option>
+              <option value="健康輕食">健康輕食</option>
+              <option value="異國料理">異國料理</option>
+              <option value="大餐犒賞">大餐犒賞</option>
+            </select>
+            <button type="submit" class="btn-add-item">＋ 新增</button>
+          </form>
+
+          <!-- 菜單列表 -->
+          <div class="menu-items-scroll" id="menuItemsList">
+            <!-- 動態渲染項目 -->
+          </div>
+
+          <!-- 底部工具 -->
+          <div class="pool-footer">
+            <span>支援自訂增刪，隨時儲存</span>
+            <button class="btn-reset-pool" onclick="confirmResetDefaults()">重置回預設菜單</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: 預算刮刮樂 ==================== -->
+    <section class="tab-content" id="scratchSection">
+      <div class="scratch-layout">
+        <div class="scratch-intro-text">
+          <h2>🪙 今日預算刮刮樂</h2>
+          <p>手頭緊還是財富自由？滑動刮開塗層，看看老天給你多少預算！</p>
+        </div>
+
+        <!-- 刮刮卡主卡片容器 -->
+        <div class="scratch-card-box">
+          <!-- 底層：預算與毒舌評語 -->
+          <div class="scratch-reward-layer" id="scratchRewardLayer">
+            <div class="reward-tag" id="rewardTag">今日午餐預算</div>
+            <div class="reward-amount" id="rewardAmount">$120</div>
+            <div class="reward-title" id="rewardTitle">標準社畜套餐</div>
+            <div class="reward-quote" id="rewardQuote">「吃飽才能繼續向資本主義低頭，記得加個滷蛋慰勞自己。」</div>
+          </div>
+
+          <!-- 上層：銀色金屬塗層 Canvas -->
+          <canvas id="scratchCanvas"></canvas>
+        </div>
+
+        <!-- 進度與重新洗牌按鈕 -->
+        <div class="scratch-controls">
+          <div class="scratch-progress-wrapper">
+            <div class="scratch-progress-bar">
+              <div class="scratch-progress-fill" id="scratchProgressFill"></div>
+            </div>
+            <div class="scratch-progress-text" id="scratchProgressText">0%</div>
+          </div>
+
+          <button class="btn-new-scratch" id="newScratchBtn" onclick="resetScratchCard()">
+            <span>✨ 換一張新刮刮樂</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       Winner Modal (輪盤抽中彈窗)
+       ========================================================================== -->
+  <div class="modal-overlay" id="winnerModal">
+    <div class="modal-card">
+      <div class="winner-badge">✨ 命運已為你抉擇 ✨</div>
+      <div class="winner-title" id="winnerFoodName">牛肉湯麵</div>
+      <div class="winner-category" id="winnerCategory">🥢 平價小吃</div>
+      <div class="winner-actions">
+        <button class="btn-modal-secondary" onclick="closeWinnerModal(); spinWheel();">🔄 不服再轉</button>
+        <button class="btn-modal-primary" onclick="closeWinnerModal()">😋 就吃這個！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       History Modal (歷史紀錄抽屜)
+       ========================================================================== -->
+  <div class="modal-overlay" id="historyModal" onclick="handleBackdropClick(event, 'historyModal')">
+    <div class="modal-card history-card">
+      <div class="history-header">
+        <h3><span>📜</span> 抽取歷史存檔</h3>
+        <button class="btn-del-item" onclick="closeHistoryModal()">✕</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <!-- 紀錄列表 -->
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn-del-item" style="font-size: 0.85rem;" onclick="clearHistory()">清空歷史紀錄</button>
+        <button class="btn-modal-primary" style="height: 38px; padding: 0 16px;" onclick="closeHistoryModal()">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ==========================================================================
+       Vanilla JavaScript Logic
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       1. 音效引擎 (Web Audio API Synthesizer)
+       ========================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.isMuted = localStorage.getItem('lunch_muted') === 'true';
+        this.noiseBuffer = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+            this.generateNoiseBuffer();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      generateNoiseBuffer() {
+        if (!this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * 0.5; // 0.5秒白噪音
+        this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = this.noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+      }
+
+      // 輪盤齒輪卡榫清脆嘀嗒音效
+      playTick() {
+        if (this.isMuted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        // 音高在 700Hz ~ 950Hz 微隨機變動，增強自然機械感
+        osc.frequency.setValueAtTime(750 + Math.random() * 200, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.035);
+
+        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.035);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.04);
+      }
+
+      // 刮刮樂刮除沙沙聲 (經過帶通濾波器的白噪音)
+      playScratch() {
+        if (this.isMuted || !this.noiseBuffer) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const whiteNoise = this.ctx.createBufferSource();
+        whiteNoise.buffer = this.noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1400 + Math.random() * 400, this.ctx.currentTime);
+        filter.Q.setValueAtTime(2.5, this.ctx.currentTime);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
+
+        whiteNoise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        whiteNoise.start();
+        whiteNoise.stop(this.ctx.currentTime + 0.06);
+      }
+
+      // 揭曉中獎慶祝琶音 (Celebration Fanfare)
+      playWin() {
+        if (this.isMuted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        // C5, E5, G5, C6 燦爛上行和弦
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.09);
+
+          gain.gain.setValueAtTime(0.001, this.ctx.currentTime + idx * 0.09);
+          gain.gain.linearRampToValueAtTime(0.2, this.ctx.currentTime + idx * 0.09 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.09 + 0.45);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(this.ctx.currentTime + idx * 0.09);
+          osc.stop(this.ctx.currentTime + idx * 0.09 + 0.5);
+        });
+      }
+
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        localStorage.setItem('lunch_muted', this.isMuted);
+        return this.isMuted;
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    function toggleMute() {
+      const isMuted = sound.toggleMute();
+      const muteIcon = document.getElementById('muteIcon');
+      const muteBtn = document.getElementById('muteToggleBtn');
+      muteIcon.textContent = isMuted ? '🔇' : '🔊';
+      muteBtn.classList.toggle('active', !isMuted);
+      showToast(isMuted ? '已開啟靜音' : '音效已開啟');
+    }
+
+    // 初始化靜音圖標
+    if (sound.isMuted) {
+      document.getElementById('muteIcon').textContent = '🔇';
+      document.getElementById('muteToggleBtn').classList.remove('active');
+    }
+
+    /* ==========================================================================
+       2. 預設資料與持久化儲存
+       ========================================================================== */
+    const DEFAULT_ITEMS = [
+      { id: '1', name: '招牌滷肉飯便當', category: '平價小吃', color: '#ff5e7e' },
+      { id: '2', name: '特濃豚骨叉燒拉麵', category: '異國料理', color: '#00f2fe' },
+      { id: '3', name: '舒肥雞胸溫沙拉', category: '健康輕食', color: '#05ffa1' },
+      { id: '4', name: '牛肉湯麵加牛汁', category: '平價小吃', color: '#ffb703' },
+      { id: '5', name: '特選熟成和牛燒肉', category: '大餐犒賞', color: '#b5179e' },
+      { id: '6', name: '香脆韓式炸雞啤酒', category: '異國料理', color: '#f72585' },
+      { id: '7', name: '低GI健康五穀紫米餐', category: '健康輕食', color: '#4facfe' },
+      { id: '8', name: '超商御飯糰配無糖豆漿', category: '平價小吃', color: '#ffd60a' },
+      { id: '9', name: '泰式打拋豬肉飯', category: '異國料理', color: '#ff70a6' },
+      { id: '10', name: '頂級炭烤肋眼牛排', category: '大餐犒賞', color: '#7209b7' }
+    ];
+
+    const SCRATCH_POOL = [
+      {
+        tag: '極致苦行者',
+        amount: '$45',
+        title: '超商光合作用套餐',
+        quote: '「兩顆茶葉蛋加一杯大溫開水，今天在辦公室主要行光合作用。」'
+      },
+      {
+        tag: '平民小確幸',
+        amount: '$70',
+        title: '肉燥飯自由',
+        quote: '「大碗肉燥飯加滷蛋，記得多舀兩勺免費的香脆辣菜脯！」'
+      },
+      {
+        tag: '標準打工人',
+        amount: '$100',
+        title: '學餐排骨便當',
+        quote: '「三樣配菜加一隻炸雞腿或排骨，碳水化合物是撐到下班的唯一真理。」'
+      },
+      {
+        tag: '職場老油條',
+        amount: '$140',
+        title: '低GI健康餐盒',
+        quote: '「舒肥水煮雞胸肉配紫米飯，拍照發IG假裝自己過得精緻自律。」'
+      },
+      {
+        tag: '微醺小奢華',
+        amount: '$220',
+        title: '特濃拉麵加叉燒',
+        quote: '「麵硬湯濃加溏心蛋，卡路里是什麼能吃嗎？吃飽下午才有力氣改需求！」'
+      },
+      {
+        tag: '報復性犒賞',
+        amount: '$350',
+        title: '美式雙層漢堡拼盤',
+        quote: '「濃郁起司肉排配大杯肥宅快樂水，明天的事明天再來後悔！」'
+      },
+      {
+        tag: '財富自由體驗券',
+        amount: '$600',
+        title: '頂級日式鰻魚雙拼定食',
+        quote: '「今天你就是整條美食街最靚的仔，吃完發票記得對獎！」'
+      },
+      {
+        tag: '玄學蹭飯者',
+        amount: '$0',
+        title: '老闆請客 / 蹭飯大師',
+        quote: '「環顧四周看哪個主管在叫外賣，眼神流露出無辜與飢餓，今天你一毛不拔！」'
+      }
+    ];
+
+    const COLOR_PALETTE = [
+      '#00f2fe', '#f72585', '#05ffa1', '#ffd60a', '#7209b7',
+      '#ff5e7e', '#4facfe', '#ffb703', '#b5179e', '#00b4d8'
+    ];
+
+    let menuItems = JSON.parse(localStorage.getItem('lunch_wheel_items')) || DEFAULT_ITEMS;
+    let activeFilter = 'all';
+
+    function saveMenuItems() {
+      localStorage.setItem('lunch_wheel_items', JSON.stringify(menuItems));
+    }
+
+    /* ==========================================================================
+       3. 命運大輪盤 (Wheel Canvas Logic)
+       ========================================================================== */
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const pointer = document.getElementById('wheelPointer');
+    const spinBtn = document.getElementById('spinBtn');
+
+    let currentRotation = 0; // 當前弧度
+    let isSpinning = false;
+    let spinAnimationId = null;
+
+    // 取得當前篩選後的菜單項目
+    function getFilteredItems() {
+      if (activeFilter === 'all') return menuItems;
+      return menuItems.filter(item => item.category === activeFilter);
+    }
+
+    // 繪製輪盤
+    function drawWheel() {
+      const items = getFilteredItems();
+      const count = items.length;
+      const width = canvas.width;
+      const height = canvas.height;
+      const center = width / 2;
+      const radius = center - 24;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (count === 0) {
+        // 空輪盤提示
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(center, center, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 36px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('此分類暫無項目，請新增！', center, center);
+        return;
+      }
+
+      const arcSize = (Math.PI * 2) / count;
+
+      ctx.save();
+      ctx.translate(center, center);
+      ctx.rotate(currentRotation);
+
+      // 繪製每個扇區
+      for (let i = 0; i < count; i++) {
+        const angle = i * arcSize;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, angle, angle + arcSize);
+        ctx.closePath();
+
+        // 扇區漸層色
+        const sliceColor = items[i].color || COLOR_PALETTE[i % COLOR_PALETTE.length];
+        ctx.fillStyle = sliceColor;
+        ctx.fill();
+
+        // 扇區邊緣微亮描邊
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 繪製扇區文字
+        ctx.save();
+        ctx.rotate(angle + arcSize / 2);
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+        ctx.shadowBlur = 6;
+
+        let fontSize = count > 12 ? 22 : (count > 8 ? 26 : 30);
+        ctx.font = `bold ${fontSize}px "Noto Sans TC", sans-serif`;
+
+        // 截短過長文字
+        let text = items[i].name;
+        if (text.length > 8) text = text.substring(0, 7) + '…';
+        ctx.fillText(text, radius - 40, 0);
+
+        // 繪製外圈標籤點
+        ctx.beginPath();
+        ctx.arc(radius - 18, 0, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // 外輪廓霓虹環
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 8;
+      ctx.shadowColor = '#00f2fe';
+      ctx.shadowBlur = 18;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 鉚釘呼吸圓點 (鉚釘裝飾)
+      const pinCount = Math.max(count * 2, 12);
+      for (let j = 0; j < pinCount; j++) {
+        const pinAngle = (j * Math.PI * 2) / pinCount;
+        const px = Math.cos(pinAngle) * (radius - 1);
+        const py = Math.sin(pinAngle) * (radius - 1);
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 5;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.restore();
+
+      // 中央中心金屬軸心
+      ctx.save();
+      ctx.translate(center, center);
+      
+      // 中心大圓 (外金屬環)
+      ctx.beginPath();
+      ctx.arc(0, 0, 52, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f172a';
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur = 15;
+      ctx.fill();
+
+      // 中心漸層按鈕盤
+      const centerGrad = ctx.createLinearGradient(-35, -35, 35, 35);
+      centerGrad.addColorStop(0, '#00f2fe');
+      centerGrad.addColorStop(1, '#f72585');
+      ctx.beginPath();
+      ctx.arc(0, 0, 40, 0, Math.PI * 2);
+      ctx.fillStyle = centerGrad;
+      ctx.fill();
+
+      // 中心圖標或文字
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 4;
+      ctx.fillText('SPIN', 0, 1);
+
+      ctx.restore();
+    }
+
+    // 計算指針所指的項目
+    // 指針在輪盤正上方 (270度 / -PI/2)
+    function getCurrentPointedItem() {
+      const items = getFilteredItems();
+      const count = items.length;
+      if (count === 0) return null;
+
+      const arcSize = (Math.PI * 2) / count;
+      // 輪盤順時針旋轉，指針固定在正上方 (相當於 -PI/2 角度)
+      let relativeAngle = (Math.PI * 1.5 - (currentRotation % (Math.PI * 2))) % (Math.PI * 2);
+      if (relativeAngle < 0) relativeAngle += Math.PI * 2;
+
+      const index = Math.floor(relativeAngle / arcSize) % count;
+      return items[index];
+    }
+
+    // 旋轉動畫
+    function spinWheel() {
+      if (isSpinning) return;
+      const items = getFilteredItems();
+      if (items.length < 2) {
+        showToast('請至少保留 2 個菜單項目才能開抽！');
+        return;
+      }
+
+      sound.init();
+      isSpinning = true;
+      spinBtn.disabled = true;
+
+      // 隨機總旋轉角度 (轉 5~8 圈 + 隨機偏移)
+      const minRotations = 6;
+      const extraRandom = Math.random() * Math.PI * 2;
+      const totalDelta = minRotations * Math.PI * 2 + extraRandom;
+
+      const startTime = performance.now();
+      const spinDuration = 3800 + Math.random() * 800; // 3.8s ~ 4.6s 自然時間
+      const startRotation = currentRotation;
+
+      let lastIndex = -1;
+
+      // Ease-Out Cubic: 減速物理自然過渡
+      function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      function animateSpin(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / spinDuration, 1);
+        const ease = easeOutCubic(progress);
+
+        currentRotation = startRotation + totalDelta * ease;
+
+        // 計算目前指針碰觸的扇區，觸發卡榫滴答聲與指針彈跳
+        const currentItem = getCurrentPointedItem();
+        if (currentItem && currentItem.id !== lastIndex) {
+          lastIndex = currentItem.id;
+          sound.playTick();
+          // 指針微幅晃動反饋
+          pointer.style.transform = `translateX(-50%) rotate(${Math.sin(elapsed) > 0 ? 12 : -12}deg)`;
+          setTimeout(() => {
+            if (pointer) pointer.style.transform = 'translateX(-50%) rotate(0deg)';
+          }, 45);
+        }
+
+        drawWheel();
+
+        if (progress < 1) {
+          spinAnimationId = requestAnimationFrame(animateSpin);
+        } else {
+          // 旋轉結束揭曉
+          isSpinning = false;
+          spinBtn.disabled = false;
+          pointer.style.transform = 'translateX(-50%) rotate(0deg)';
+
+          const winner = getCurrentPointedItem();
+          if (winner) {
+            handleWinnerReveal(winner);
+          }
+        }
+      }
+
+      spinAnimationId = requestAnimationFrame(animateSpin);
+    }
+
+    // 揭曉結果
+    function handleWinnerReveal(winner) {
+      sound.playWin();
+
+      // 釋放五彩紙屑 Confetti 粒子
+      fireConfetti();
+
+      // 寫入歷史紀錄
+      addHistoryRecord({
+        type: 'wheel',
+        title: winner.name,
+        category: winner.category,
+        time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      });
+
+      // 彈窗通知
+      const winnerModal = document.getElementById('winnerModal');
+      document.getElementById('winnerFoodName').textContent = winner.name;
+      document.getElementById('winnerCategory').textContent = `分類：${winner.category}`;
+      winnerModal.classList.add('active');
+    }
+
+    function closeWinnerModal() {
+      document.getElementById('winnerModal').classList.remove('active');
+    }
+
+    // 粒子發射器 (相容 Canvas-confetti 或純原生 fallback)
+    function fireConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#00f2fe', '#f72585', '#05ffa1', '#ffd60a', '#ffffff']
+        });
+      } else {
+        // 原生備用 Canvas 粒子發射器
+        const fallCanvas = document.createElement('canvas');
+        fallCanvas.style.position = 'fixed';
+        fallCanvas.style.inset = '0';
+        fallCanvas.style.width = '100vw';
+        fallCanvas.style.height = '100vh';
+        fallCanvas.style.pointerEvents = 'none';
+        fallCanvas.style.zIndex = '9999';
+        document.body.appendChild(fallCanvas);
+
+        fallCanvas.width = window.innerWidth;
+        fallCanvas.height = window.innerHeight;
+        const fCtx = fallCanvas.getContext('2d');
+
+        const colors = ['#00f2fe', '#f72585', '#05ffa1', '#ffd60a', '#ffffff'];
+        const particles = Array.from({ length: 90 }).map(() => ({
+          x: fallCanvas.width / 2 + (Math.random() - 0.5) * 100,
+          y: fallCanvas.height * 0.65,
+          vx: (Math.random() - 0.5) * 16,
+          vy: -(Math.random() * 12 + 10),
+          size: Math.random() * 8 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 8
+        }));
+
+        let frameCount = 0;
+        function updateFallback() {
+          fCtx.clearRect(0, 0, fallCanvas.width, fallCanvas.height);
+          particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.45; // 重力
+            p.rotation += p.rotSpeed;
+
+            fCtx.save();
+            fCtx.translate(p.x, p.y);
+            fCtx.rotate((p.rotation * Math.PI) / 180);
+            fCtx.fillStyle = p.color;
+            fCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+            fCtx.restore();
+          });
+
+          frameCount++;
+          if (frameCount < 160) {
+            requestAnimationFrame(updateFallback);
+          } else {
+            fallCanvas.remove();
+          }
+        }
+        updateFallback();
+      }
+    }
+
+    /* ==========================================================================
+       4. 菜單管理池邏輯 (CRUD & 篩選)
+       ========================================================================== */
+    function renderMenuItems() {
+      const listContainer = document.getElementById('menuItemsList');
+      const badge = document.getElementById('poolCountBadge');
+      const items = getFilteredItems();
+
+      badge.textContent = `${items.length} 項`;
+      listContainer.innerHTML = '';
+
+      if (items.length === 0) {
+        listContainer.innerHTML = `<div style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:0.9rem;">目前分類無菜單項目</div>`;
+        drawWheel();
+        return;
+      }
+
+      items.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'menu-item-row';
+        row.innerHTML = `
+          <div class="menu-item-info">
+            <span class="menu-item-dot" style="background-color: ${item.color}; color: ${item.color}"></span>
+            <span class="menu-item-name">${escapeHtml(item.name)}</span>
+            <span class="menu-item-cat">${escapeHtml(item.category)}</span>
+          </div>
+          <button class="btn-del-item" title="刪除項目" onclick="deleteMenuItem('${item.id}')">✕</button>
+        `;
+        listContainer.appendChild(row);
+      });
+
+      drawWheel();
+    }
+
+    function handleAddItem(event) {
+      event.preventDefault();
+      const input = document.getElementById('newItemInput');
+      const select = document.getElementById('newItemCategory');
+      const name = input.value.trim();
+
+      if (!name) return;
+
+      const randomColor = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+      const newItem = {
+        id: Date.now().toString(),
+        name: name,
+        category: select.value,
+        color: randomColor
+      };
+
+      menuItems.unshift(newItem);
+      saveMenuItems();
+      input.value = '';
+      showToast(`已新增「${name}」！`);
+      renderMenuItems();
+    }
+
+    function deleteMenuItem(id) {
+      if (menuItems.length <= 2) {
+        showToast('菜單至少需要保留 2 個項目！');
+        return;
+      }
+      const itemToDelete = menuItems.find(item => item.id === id);
+      menuItems = menuItems.filter(item => item.id !== id);
+      saveMenuItems();
+      if (itemToDelete) {
+        showToast(`已刪除「${itemToDelete.name}」`);
+      }
+      renderMenuItems();
+    }
+
+    function setCategoryFilter(category) {
+      activeFilter = category;
+      const chips = document.querySelectorAll('.cat-chip');
+      chips.forEach(chip => {
+        chip.classList.toggle('active', chip.textContent.includes(category) || (category === 'all' && chip.textContent === '全部'));
+      });
+      renderMenuItems();
+    }
+
+    function shuffleCurrentItems() {
+      // 隨機洗牌
+      for (let i = menuItems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [menuItems[i], menuItems[j]] = [menuItems[j], menuItems[i]];
+      }
+      saveMenuItems();
+      renderMenuItems();
+      showToast('菜單順序已打亂重組！');
+    }
+
+    function confirmResetDefaults() {
+      if (confirm('確定要恢復預設菜單池嗎？自訂新增的菜單將被重置。')) {
+        menuItems = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        saveMenuItems();
+        activeFilter = 'all';
+        setCategoryFilter('all');
+        renderMenuItems();
+        showToast('已恢復預設菜單！');
+      }
+    }
+
+    /* ==========================================================================
+       5. 預算刮刮樂 (Scratch Card Canvas Logic)
+       ========================================================================== */
+    const scratchCanvas = document.getElementById('scratchCanvas');
+    const scratchCtx = scratchCanvas.getContext('2d');
+    const scratchFill = document.getElementById('scratchProgressFill');
+    const scratchProgressText = document.getElementById('scratchProgressText');
+
+    let isScratching = false;
+    let isScratchRevealed = false;
+    let scratchInitialized = false;
+    let currentReward = null;
+    let lastScratchSoundTime = 0;
+
+    // 初始化/設定刮刮樂尺寸與塗層
+    function initScratchCard(isNewCard = true) {
+      const container = scratchCanvas.parentElement;
+      const rect = container.getBoundingClientRect();
+      
+      // 若容器尚未可見，等待切換到 Tab 2 時再精確測量
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      scratchCanvas.width = Math.floor(rect.width * dpr);
+      scratchCanvas.height = Math.floor(rect.height * dpr);
+
+      // 若要求抽新卡或尚未有獎勵，隨機抽一張預算
+      if (isNewCard || !currentReward) {
+        currentReward = SCRATCH_POOL[Math.floor(Math.random() * SCRATCH_POOL.length)];
+        document.getElementById('rewardTag').textContent = currentReward.tag;
+        document.getElementById('rewardAmount').textContent = currentReward.amount;
+        document.getElementById('rewardTitle').textContent = currentReward.title;
+        document.getElementById('rewardQuote').textContent = currentReward.quote;
+      }
+
+      isScratchRevealed = false;
+      scratchCanvas.style.opacity = '1';
+      scratchCanvas.style.pointerEvents = 'auto';
+      updateScratchProgress(0);
+
+      renderScratchCoating();
+      scratchInitialized = true;
+    }
+
+    // 繪製銀色金屬感刮刮層
+    function renderScratchCoating() {
+      const w = scratchCanvas.width;
+      const h = scratchCanvas.height;
+
+      scratchCtx.globalCompositeOperation = 'source-over';
+      scratchCtx.clearRect(0, 0, w, h);
+
+      // 銀金屬漸層
+      const grad = scratchCtx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#94a3b8');
+      grad.addColorStop(0.25, '#e2e8f0');
+      grad.addColorStop(0.5, '#64748b');
+      grad.addColorStop(0.75, '#cbd5e1');
+      grad.addColorStop(1, '#94a3b8');
+
+      scratchCtx.fillStyle = grad;
+      scratchCtx.fillRect(0, 0, w, h);
+
+      // 金屬微噪點拉絲紋理
+      scratchCtx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+      for (let i = 0; i < 450; i++) {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        const len = 25 + Math.random() * 50;
+        scratchCtx.fillRect(x, y, len, 2);
+      }
+
+      // 金色細緻邊框裝飾
+      scratchCtx.strokeStyle = 'rgba(255, 214, 10, 0.5)';
+      scratchCtx.lineWidth = Math.max(4, Math.floor(w * 0.01));
+      scratchCtx.strokeRect(16, 16, w - 32, h - 32);
+
+      // 中央提示印章文字
+      scratchCtx.save();
+      scratchCtx.fillStyle = '#0f172a';
+      scratchCtx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+      scratchCtx.shadowBlur = 4;
+      scratchCtx.textAlign = 'center';
+      scratchCtx.textBaseline = 'middle';
+      
+      const titleSize = Math.max(18, Math.floor(w * 0.052));
+      scratchCtx.font = `900 ${titleSize}px "Noto Sans TC", sans-serif`;
+      scratchCtx.fillText('🪙 刮開揭曉今日預算 🪙', w / 2, h / 2 - 14);
+
+      const subtitleSize = Math.max(12, Math.floor(w * 0.028));
+      scratchCtx.font = `600 ${subtitleSize}px "Noto Sans TC", sans-serif`;
+      scratchCtx.fillStyle = '#334155';
+      scratchCtx.fillText('滑鼠拖曳或手機觸控進行塗抹', w / 2, h / 2 + 22);
+      scratchCtx.restore();
+    }
+
+    // 刮除塗抹邏輯
+    function scratchAt(clientX, clientY) {
+      if (isScratchRevealed) return;
+
+      const rect = scratchCanvas.getBoundingClientRect();
+      const scaleX = scratchCanvas.width / rect.width;
+      const scaleY = scratchCanvas.height / rect.height;
+
+      const x = (clientX - rect.left) * scaleX;
+      const y = (clientY - rect.top) * scaleY;
+
+      // 使用 destination-out 擦除
+      scratchCtx.globalCompositeOperation = 'destination-out';
+      scratchCtx.beginPath();
+      // 筆刷半徑
+      const brushRadius = Math.max(24, scratchCanvas.width * 0.06);
+      scratchCtx.arc(x, y, brushRadius, 0, Math.PI * 2);
+      scratchCtx.fill();
+
+      // 播放刮除沙沙聲 (節流 75ms 避免頻繁堆疊)
+      const now = performance.now();
+      if (now - lastScratchSoundTime > 75) {
+        sound.playScratch();
+        lastScratchSoundTime = now;
+      }
+
+      checkScratchPercentage();
+    }
+
+    // 取樣計算刮除百分比
+    function checkScratchPercentage() {
+      if (isScratchRevealed) return;
+
+      const w = scratchCanvas.width;
+      const h = scratchCanvas.height;
+      const step = 20; // 間距抽樣優化效能
+      const imgData = scratchCtx.getImageData(0, 0, w, h);
+      const pixels = imgData.data;
+
+      let transparentCount = 0;
+      let totalSamples = 0;
+
+      for (let y = 0; y < h; y += step) {
+        for (let x = 0; x < w; x += step) {
+          const index = (y * w + x) * 4 + 3; // Alpha 通道
+          if (pixels[index] < 128) {
+            transparentCount++;
+          }
+          totalSamples++;
+        }
+      }
+
+      const percent = Math.round((transparentCount / totalSamples) * 100);
+      updateScratchProgress(percent);
+
+      // 當超過 50% 時自動清空揭曉
+      if (percent >= 50) {
+        revealEntireCard();
+      }
+    }
+
+    function updateScratchProgress(percent) {
+      scratchFill.style.width = `${percent}%`;
+      scratchProgressText.textContent = `${percent}%`;
+    }
+
+    // 全部自動揭曉
+    function revealEntireCard() {
+      if (isScratchRevealed) return;
+      isScratchRevealed = true;
+      updateScratchProgress(100);
+
+      // 塗層淡出動畫
+      scratchCanvas.style.opacity = '0';
+      scratchCanvas.style.pointerEvents = 'none';
+
+      // 慶祝音效與特效
+      sound.playWin();
+      fireConfetti();
+
+      // 記錄進歷史存檔
+      if (currentReward) {
+        addHistoryRecord({
+          type: 'scratch',
+          title: `${currentReward.amount} (${currentReward.title})`,
+          category: currentReward.tag,
+          time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        });
+      }
+
+      showToast(`恭喜揭曉！今日預算 ${currentReward.amount}`);
+    }
+
+    // 重置刮刮卡 (換一張)
+    function resetScratchCard() {
+      initScratchCard(true);
+      showToast('已為您更換一張全新的預算刮刮樂！');
+    }
+
+    // 滑鼠事件監聽
+    scratchCanvas.addEventListener('mousedown', (e) => {
+      isScratching = true;
+      sound.init();
+      scratchAt(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isScratching) {
+        scratchAt(e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isScratching = false;
+    });
+
+    // 手機觸控事件監聽
+    scratchCanvas.addEventListener('touchstart', (e) => {
+      isScratching = true;
+      sound.init();
+      if (e.touches.length > 0) {
+        scratchAt(e.touches[0].clientX, e.touches[0].clientY);
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    scratchCanvas.addEventListener('touchmove', (e) => {
+      if (isScratching && e.touches.length > 0) {
+        scratchAt(e.touches[0].clientX, e.touches[0].clientY);
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    scratchCanvas.addEventListener('touchend', () => {
+      isScratching = false;
+    });
+
+    /* ==========================================================================
+       6. 歷史紀錄系統 (History Drawer)
+       ========================================================================== */
+    function getHistoryRecords() {
+      return JSON.parse(localStorage.getItem('lunch_history') || '[]');
+    }
+
+    function addHistoryRecord(record) {
+      const records = getHistoryRecords();
+      records.unshift(record);
+      if (records.length > 30) records.pop(); // 最多保留 30 筆
+      localStorage.setItem('lunch_history', JSON.stringify(records));
+    }
+
+    function openHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      const list = document.getElementById('historyList');
+      const records = getHistoryRecords();
+
+      list.innerHTML = '';
+      if (records.length === 0) {
+        list.innerHTML = `<div class="history-empty">尚無任何抽獎存檔記錄，快去開抽吧！</div>`;
+      } else {
+        records.forEach(rec => {
+          const item = document.createElement('div');
+          item.className = 'history-item';
+          const isWheel = rec.type === 'wheel';
+          item.innerHTML = `
+            <div>
+              <div class="history-item-title">
+                <span>${isWheel ? '🎡' : '🪙'}</span>
+                <span>${escapeHtml(rec.title)}</span>
+              </div>
+              <div class="history-item-time">${rec.time}</div>
+            </div>
+            <span class="history-item-badge ${isWheel ? 'badge-wheel' : 'badge-scratch'}">
+              ${escapeHtml(rec.category || (isWheel ? '午餐' : '預算'))}
+            </span>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').classList.remove('active');
+    }
+
+    function clearHistory() {
+      if (confirm('確定要清空所有的歷史存檔記錄嗎？')) {
+        localStorage.removeItem('lunch_history');
+        openHistoryModal();
+        showToast('歷史存檔已清空');
+      }
+    }
+
+    function handleBackdropClick(event, modalId) {
+      if (event.target.id === modalId) {
+        document.getElementById(modalId).classList.remove('active');
+      }
+    }
+
+    /* ==========================================================================
+       7. 導航與 Tab 切換
+       ========================================================================== */
+    function switchTab(tab) {
+      const wheelSection = document.getElementById('wheelSection');
+      const scratchSection = document.getElementById('scratchSection');
+      const tabWheelBtn = document.getElementById('tabWheelBtn');
+      const tabScratchBtn = document.getElementById('tabScratchBtn');
+
+      if (tab === 'wheel') {
+        wheelSection.classList.add('active');
+        scratchSection.classList.remove('active');
+        tabWheelBtn.classList.add('active');
+        tabScratchBtn.classList.remove('active');
+        drawWheel();
+      } else if (tab === 'scratch') {
+        wheelSection.classList.remove('active');
+        scratchSection.classList.add('active');
+        tabWheelBtn.classList.remove('active');
+        tabScratchBtn.classList.add('active');
+        
+        requestAnimationFrame(() => {
+          if (!scratchInitialized) {
+            initScratchCard(false);
+          }
+        });
+      }
+    }
+
+    /* ==========================================================================
+       8. Toast & 輔助函數
+       ========================================================================== */
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(match) {
+        const escapeMap = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        };
+        return escapeMap[match];
+      });
+    }
+
+    // 視窗 resize 處理
+    window.addEventListener('resize', () => {
+      drawWheel();
+      if (scratchCanvas.offsetParent !== null && !isScratchRevealed) {
+        initScratchCard(false);
+      }
+    });
+
+    // 啟動初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMenuItems();
+      // 隨機選定初始卡片，但不急著畫 Canvas 直到進入 Tab 或首次顯示
+      currentReward = SCRATCH_POOL[Math.floor(Math.random() * SCRATCH_POOL.length)];
+      document.getElementById('rewardTag').textContent = currentReward.tag;
+      document.getElementById('rewardAmount').textContent = currentReward.amount;
+      document.getElementById('rewardTitle').textContent = currentReward.title;
+      document.getElementById('rewardQuote').textContent = currentReward.quote;
+    });
+  </script>
+</body>
+</html>
